@@ -7,7 +7,7 @@ def calculate_CAGR(start_price, end_price, periods):
 
 def get_stock_data(ticker):
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=15*365)  # 15 years ago
+    start_date = end_date - timedelta(days=20*365)  # 20 years ago
     data = yf.download(ticker, start=start_date, end=end_date)
     return data
 
@@ -27,10 +27,10 @@ def main():
                 continue
             data = get_stock_data(ticker)
             
-            if not data.empty and len(data) >= 3600:  # Ensure sufficient data points for 15 years
+            if not data.empty and len(data) >= 3600:  # Ensure sufficient data points for 20 years
                 start_price = data['Adj Close'].iloc[0]
                 end_price = data['Adj Close'].iloc[-1]
-                periods = 15  # 15 years
+                periods = 20  # 20 years
 
                 CAGR = calculate_CAGR(start_price, end_price, periods)
 
@@ -56,6 +56,7 @@ def main():
             print(f"Error processing {ticker}: {e}")
 
     stock_list = sorted(stock_list, key=lambda x: x['CAGR (%)'], reverse=True)        
+    stock_list = stock_list[:100]  # Limit to top 100 stocks
 
     df = pd.DataFrame(stock_list)
     df.to_csv('indonesian_stocks_CAGR.csv', index=False)

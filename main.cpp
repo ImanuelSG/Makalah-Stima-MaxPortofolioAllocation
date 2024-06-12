@@ -91,34 +91,43 @@ void backtrack(unordered_map<string, pair<Stock, int>> &best_portfolio,
                const vector<Stock> &stock_list,
                double max_allocation)
 {
-
+    // Pengecekan solusi terbaik
     if (!portfolio.empty() && current_return > best_return)
     {
         best_portfolio = portfolio;
         best_return = current_return;
     }
 
+    // Fungsi Pembangkit
     for (int i = index; i < stock_list.size(); ++i)
     {
         const Stock &stock = stock_list[i];
-        if (stock.stock_price <= current_cash && portfolio.find(stock.stock_id) == portfolio.end())
+        // Fungsi pembatas bagian alokasi dana dan keunikan saham
+        if (stock.stock_price <= current_cash && portfolio.find(stock.stock_id) == portfolio.end()) 
         {
+            // Fungsi pembatas bagian keunikan industri
             if (industries.find(stock.industry) == industries.end())
             {
+                // Fungsi pembatas bagian alokasi kapitalisasi pasar
                 int max_lots = min(
                     static_cast<int>(floor((stock.market_cap * 0.01 / stock.stock_price) / 100)),
                     static_cast<int>(floor(max_allocation / (stock.stock_price * 100))));
 
-                int lots_to_buy = min(max_lots, static_cast<int>(floor(current_cash / (stock.stock_price * 100))));
+                int lots_to_buy = min(max_lots, static_cast<int>(floor(current_cash / 
+                (stock.stock_price * 100))));
 
                 if (lots_to_buy > 0)
                 {
                     portfolio[stock.stock_id] = {stock, lots_to_buy};
                     double new_cash = current_cash - lots_to_buy * stock.stock_price * 100;
-                    double new_return = current_return + lots_to_buy * stock.stock_price * 100 * (1 + stock.CAGR / 100);
+                    double new_return = current_return + lots_to_buy * stock.stock_price * 100 
+                    * (1 + stock.CAGR / 100);
                     industries.insert(stock.industry);
 
-                    backtrack(best_portfolio, best_return, portfolio, new_cash, new_return, i + 1, industries, stock_list, max_allocation);
+
+                    // Pemanggilan secara rekursif untuk melanjutkan pencarian secara Depth First
+                    backtrack(best_portfolio, best_return, portfolio, new_cash, 
+                    new_return, i + 1, industries, stock_list, max_allocation);
 
                     industries.erase(stock.industry);
                     portfolio.erase(stock.stock_id);
@@ -128,7 +137,8 @@ void backtrack(unordered_map<string, pair<Stock, int>> &best_portfolio,
     }
 }
 
-pair<unordered_map<string, pair<Stock, int>>, double> algorithm(vector<Stock> &stock_list, double max_allocation_percent, double cash)
+pair<unordered_map<string, pair<Stock, int>>, double> algorithm(vector<Stock> &stock_list, 
+double max_allocation_percent, double cash)
 {
     sort(stock_list.begin(), stock_list.end(), [](const Stock &a, const Stock &b)
          { return a.CAGR > b.CAGR; });
@@ -140,7 +150,8 @@ pair<unordered_map<string, pair<Stock, int>>, double> algorithm(vector<Stock> &s
     unordered_map<string, pair<Stock, int>> portfolio;
     unordered_set<string> industries;
 
-    backtrack(best_portfolio, best_return, portfolio, cash, 0, 0, industries, stock_list, max_allocation);
+    backtrack(best_portfolio, best_return, portfolio, cash, 0, 0, 
+    industries, stock_list, max_allocation);
 
     return {best_portfolio, best_return};
 }
@@ -162,7 +173,6 @@ void print_portfolio(const unordered_map<string, pair<Stock, int>> &portfolio, d
         const Stock &stock = entry.second.first;
         int lots = entry.second.second;
         total += lots * stock.stock_price * 100;
-
     }
 
     cout << "\nTotal Investasi: Rp. " << format_with_dots(total) << "\n";
