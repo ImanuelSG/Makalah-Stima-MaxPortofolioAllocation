@@ -1,2 +1,2 @@
 # Makalah-Stima-MaxPortofolioAllocation
-Makalah Stima 2024 - Optimum Portofolio Allocation
+Dibuat untuk menyelesaikan tugas makalah IF2211 Strategi Algoritma
